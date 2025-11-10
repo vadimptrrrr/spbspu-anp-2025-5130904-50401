@@ -6,9 +6,9 @@ namespace petrov
 {
   void create(std::istream & input, int * mtx, size_t rows, size_t cols);
   bool it_number(const char * w);
-  void LFT_BOT_CNT(int * mtx, size_t rows, size_t cols);
+  void LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t cols);
   void vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down = true);
-  void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right = true)
+  void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right = true);
 } 
 
 void create(std::istream & input, int * mtx, size_t rows, size_t cols)
@@ -27,7 +27,7 @@ bool petrov::it_number(const char * w)
   }
 }
 
-void petrov::vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down = true)
+void petrov::vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down)
 {
   if (move_down) 
   {
@@ -45,7 +45,7 @@ void petrov::vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& 
   }
 }
 
-void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right = true)
+void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right)
 {
   if (move_right) 
   {
@@ -63,13 +63,37 @@ void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, boo
   }
 }
 
-void petrov::LFT_BOT_CNT(int * mtx, size_t rows, size_t cols)
+void petrov::LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t cols)
 {
-  size_t plus_step = 1, id_r = rows - 1, id_c = cols - 1;
-  for(size_t k = 0; k < (rows * cols); ++k)
+  size_t current_step = 1;
+  size_t top = 0, bottom = rows - 1, right = cols - 1, left = 0;
+  
+  while (top < bottom + 1 && left < right + 1) 
   {
-
+    petrov::hor_step(mtx, bottom, cols, current_step, true);
+    bottom--;
+    
+    petrov::vert_step(mtx, right, rows, cols, current_step, false);
+    right--;
+    
+    if (top < bottom + 1) 
+    {
+      petrov::hor_step(mtx, top, cols, current_step, false);
+      top++;
+    }
+    
+    if (left < right + 1) 
+    {
+      petrov::vert_step(mtx, left, rows, cols, current_step, true);
+      left++;
+    }
   }
+
+  output << rows << " " << cols;
+  for (size_t i = 0; i < rows * cols; ++i) {
+    output << " " << mtx[i];
+  }
+  output << "\n";
 }
 
 int main(int argc, char ** argv)
@@ -91,7 +115,14 @@ int main(int argc, char ** argv)
     return 1;
   }
   
-  
+  std::ifstream input(argv[2]);
+  std::ofstream output(argv[3]);
+  size_t rows = 0, cols = 0;
+  input >> rows >> cols;
+  if (!input) {~
+    std::cerr << "BAD input\n";
+    return 2;
+  }
   
 
 }
