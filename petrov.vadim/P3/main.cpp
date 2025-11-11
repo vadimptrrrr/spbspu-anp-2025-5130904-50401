@@ -98,7 +98,8 @@ void petrov::LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t c
   }
 
   output << rows << " " << cols;
-  for (size_t i = 0; i < rows * cols; ++i) {
+  for (size_t i = 0; i < rows * cols; ++i) 
+  {
     output << " " << mtx[i];
   }
   output << "\n";
