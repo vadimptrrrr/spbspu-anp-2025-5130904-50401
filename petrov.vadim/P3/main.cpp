@@ -8,7 +8,7 @@ namespace petrov
   bool it_number(const char * w);
   void LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t cols);
   void vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down = true);
-  void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right = true);
+  void hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right = true);
 } 
 
 void create(std::istream & input, int * mtx, size_t rows, size_t cols)
@@ -21,10 +21,18 @@ void create(std::istream & input, int * mtx, size_t rows, size_t cols)
 
 bool petrov::it_number(const char * w)
 {
-  if (!w || w != "1" || w != "2")
+  if (!w || *w == '\0')
   {
     return false;
   }
+  for (size_t i = 0; w[i] != '\0'; ++i)
+  {
+    if (w[i] < '0' || w[i] > '9') 
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 void petrov::vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down)
@@ -119,7 +127,7 @@ int main(int argc, char ** argv)
   std::ofstream output(argv[3]);
   size_t rows = 0, cols = 0;
   input >> rows >> cols;
-  if (!input) {~
+  if (!input) {
     std::cerr << "BAD input\n";
     return 2;
   }
