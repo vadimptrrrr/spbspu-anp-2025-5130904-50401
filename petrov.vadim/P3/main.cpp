@@ -14,7 +14,7 @@ namespace petrov
   void hor_step_2(int * mtx, size_t row, size_t cols, size_t plus_step);
 }
 
-void create(std::istream & input, int * mtx, size_t rows, size_t cols)
+void petrov::create(std::istream & input, int * mtx, size_t rows, size_t cols)
 {
   for(size_t i = 0; i < (rows*cols); ++i)
   {
@@ -186,4 +186,38 @@ int main(int argc, char ** argv)
     std::cerr << "BAD input\n";
     return 2;
   }
+
+  if (argv[1][0] == '1')
+  {
+    int matrix[10000] = {};
+    petrov::create(input, matrix, rows, cols);
+    if (!input)
+    {
+      std::cerr << "BAD input\n";
+      delete[] matrix;
+      return 2;
+    }
+
+    petrov::LFT_BOT_CNT(output, matrix, rows, cols);
+    petrov::FLL_INC_WAV(output, matrix, rows, cols);
+  }
+
+  int * matrix = new int[rows * cols];
+  petrov::create(input, matrix, rows, cols);
+  if (!input)
+  {
+    std::cerr << "BAD input\n";
+    delete[] matrix;
+    return 2;
+  }
+  try
+  {
+    petrov::LFT_BOT_CNT(output, matrix, rows, cols);
+    petrov::FLL_INC_WAV(output, matrix, rows, cols);  }
+  catch(const std::exception& e)
+  {
+    delete[] matrix;
+    throw;
+  }
+  delete[] matrix;
 }
