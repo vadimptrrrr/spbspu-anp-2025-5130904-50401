@@ -7,8 +7,8 @@ namespace petrov
   void create(std::istream & input, int * mtx, size_t rows, size_t cols);
   bool it_number(const char * w);
   void LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t cols);
-  void vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down = true);
-  void hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right = true);
+  void vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols);
+  void hor_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_right, size_t cols);
   void FLL_INC_WAV(std::ostream & output, int * mtx, size_t rows, size_t cols);
   void vert_step_2(int * mtx, size_t col, size_t rows, size_t cols, size_t plus_step);
   void hor_step_2(int * mtx, size_t row, size_t cols, size_t plus_step);
@@ -38,38 +38,42 @@ bool petrov::it_number(const char * w)
   return true;
 }
 
-void petrov::vert_step(int * mtx, size_t col, size_t rows, size_t cols, size_t& plus_step, bool move_down)
+void petrov::vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols)
 {
   if (move_down)
   {
-    for (size_t i = 0; i < rows; ++i)
+    for (long long i = (long long)top; i <= (long long)bottom; ++i)
     {
-      mtx[i * cols + col] += plus_step;
-      plus_step++;
+      mtx[i * cols + left] += plus_step;
+      ++plus_step;
     }
-  } else {
-    for (size_t i = rows; i > 0; --i)
+  }
+  else
+  {
+    for (long long i = (long long)bottom; i >= (long long)top; --i)
     {
-      mtx[(i - 1) * cols + col] += plus_step;
-      plus_step++;
+      mtx[i * cols + right] += (int)plus_step;
+      ++plus_step;
     }
   }
 }
 
-void petrov::hor_step(int * mtx, size_t row, size_t cols, size_t& plus_step, bool move_right)
+void petrov::hor_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_right, size_t cols)
 {
   if (move_right)
   {
-    for (size_t i = 0; i < cols; ++i)
+    for (long long i = (long long)left; i <= (long long)right; ++i)
     {
-      mtx[row * cols + i] += plus_step;
-      plus_step++;
+      mtx[bottom * cols + i] += (int)plus_step;
+      ++plus_step;
     }
-  } else {
-    for (size_t i = cols; i > 0; --i)
+  }
+  else
+  {
+    for (long long i = (long long)right; i >= (long long)left; --i)
     {
-      mtx[row * cols + (i - 1)] += plus_step;
-      plus_step++;
+      mtx[top * cols + i] += (int)plus_step;
+      ++plus_step;
     }
   }
 }
@@ -79,24 +83,26 @@ void petrov::LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t c
   size_t current_step = 1;
   size_t top = 0, bottom = rows - 1, right = cols - 1, left = 0;
 
-  while (top < bottom + 1 && left < right + 1)
+  while (top <= bottom && left <= right)
   {
-    petrov::hor_step(mtx, bottom, cols, current_step, true);
-    bottom--;
+    hor_step(mtx, top, bottom, right, left, current_step, true, cols);
+    if (bottom == 0) break;
+    --bottom;
 
-    petrov::vert_step(mtx, right, rows, cols, current_step, false);
-    right--;
+    vert_step(mtx, top, bottom, right, left, current_step, false, cols);
+    if (right == 0) break;
+    --right;
 
-    if (top < bottom + 1)
+    if (top <= bottom)
     {
-      petrov::hor_step(mtx, top, cols, current_step, false);
-      top++;
+      hor_step(mtx, top, bottom, right, left, current_step, false, cols);
+      ++top;
     }
 
-    if (left < right + 1)
+    if (left <= right)
     {
-      petrov::vert_step(mtx, left, rows, cols, current_step, true);
-      left++;
+      vert_step(mtx, top, bottom, right, left, current_step, true, cols);
+      ++left;
     }
   }
   output << rows << " " << cols;
