@@ -10,8 +10,8 @@ namespace petrov
   void vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols);
   void hor_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_right, size_t cols);
   void FLL_INC_WAV(std::ostream & output, int * mtx, size_t rows, size_t cols);
-  void vert_step_2(int * mtx, size_t col, size_t rows, size_t cols, size_t plus_step);
-  void hor_step_2(int * mtx, size_t row, size_t cols, size_t plus_step);
+  void vert_step_2(int * mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step);
+  void hor_step_2(int * mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step);
 }
 
 void petrov::create(std::istream & input, int * mtx, size_t rows, size_t cols)
@@ -113,19 +113,19 @@ void petrov::LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t c
   output << "\n";
 }
 
-void petrov::vert_step_2(int * mtx, size_t col, size_t rows, size_t cols, size_t plus_step)
+void petrov::vert_step_2(int * mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step)
 {
-  for (size_t i = 0; i < rows; ++i)
+  for (size_t r = row_start; r <= row_end; ++r)
   {
-    mtx[i * cols + col] += plus_step;
+    mtx[r * cols + col] += (int)plus_step;
   }
 }
 
-void petrov::hor_step_2(int * mtx, size_t row, size_t cols, size_t plus_step)
+void petrov::hor_step_2(int * mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step)
 {
-  for (size_t i = 0; i < cols; ++i)
+  for (size_t i = col_start; i <= col_end; ++i)
   {
-    mtx[row * cols + i] += plus_step;
+    mtx[row * cols + i] += (int)plus_step;
   }
 }
 
@@ -133,27 +133,32 @@ void petrov::FLL_INC_WAV(std::ostream & output, int * mtx, size_t rows, size_t c
 {
   size_t current_step = 1;
   size_t top = 0, bottom = rows - 1, right = cols - 1, left = 0;
-  while (top < bottom + 1 && left < right + 1)
+  while (top <= bottom && left <= right)
   {
-    petrov::hor_step_2(mtx, bottom, cols, current_step);
-    bottom--;
+    hor_step_2(mtx, bottom, left, right, cols, current_step);
+    if (bottom == 0) break;
+    --bottom;
 
-    petrov::vert_step_2(mtx, right, rows, cols, current_step);
-    right--;
-
-    if (top < bottom + 1)
+    if (top <= bottom && left <= right)
     {
-      petrov::hor_step_2(mtx, top, cols, current_step);
-      top++;
+      vert_step_2(mtx, right, top, bottom, cols, current_step);
+      if (right == 0) break;
+      --right;
     }
 
-    if (left < right + 1)
+    if (top <= bottom && left <= right)
     {
-      petrov::vert_step_2(mtx, left, rows, cols, current_step);
-      left++;
+      hor_step_2(mtx, top, left, right, cols, current_step);
+      ++top;
     }
 
-    current_step++;
+    if (top <= bottom && left <= right)
+    {
+      vert_step_2(mtx, left, top, bottom, cols, current_step);
+      ++left;
+    }
+
+    ++current_step;
   }
 
   output << rows << " " << cols;
@@ -219,7 +224,8 @@ int main(int argc, char ** argv)
   try
   {
     petrov::LFT_BOT_CNT(output, matrix, rows, cols);
-    petrov::FLL_INC_WAV(output, matrix, rows, cols);  }
+    petrov::FLL_INC_WAV(output, matrix, rows, cols);
+  }
   catch(const std::exception& e)
   {
     delete[] matrix;
