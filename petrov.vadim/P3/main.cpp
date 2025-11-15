@@ -42,7 +42,7 @@ void petrov::vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_
 {
   if (move_down)
   {
-    for (long long i = (long long)top; i <= (long long)bottom; ++i)
+    for (long long i = static_cast<long long> (top); i <= static_cast<long long> (bottom); ++i)
     {
       mtx[i * cols + left] += plus_step;
       ++plus_step;
@@ -50,9 +50,9 @@ void petrov::vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_
   }
   else
   {
-    for (long long i = (long long)bottom; i >= (long long)top; --i)
+    for (long long i = static_cast<long long> (bottom); i >= static_cast<long long> (top); --i)
     {
-      mtx[i * cols + right] += (int)plus_step;
+      mtx[i * cols + right] += static_cast<int> (plus_step);
       ++plus_step;
     }
   }
@@ -62,17 +62,17 @@ void petrov::hor_step(int * mtx, size_t top, size_t bottom, size_t right, size_t
 {
   if (move_right)
   {
-    for (long long i = (long long)left; i <= (long long)right; ++i)
+    for (long long i = static_cast<long long> (left); i <= static_cast<long long> (right); ++i)
     {
-      mtx[bottom * cols + i] += (int)plus_step;
+      mtx[bottom * cols + i] += static_cast<int> (plus_step);
       ++plus_step;
     }
   }
   else
   {
-    for (long long i = (long long)right; i >= (long long)left; --i)
+    for (long long i = static_cast<long long> (right); i >= static_cast<long long> (left); --i)
     {
-      mtx[top * cols + i] += (int)plus_step;
+      mtx[top * cols + i] += static_cast<int> (plus_step);
       ++plus_step;
     }
   }
@@ -117,7 +117,7 @@ void petrov::vert_step_2(int * mtx, size_t col, size_t row_start, size_t row_end
 {
   for (size_t r = row_start; r <= row_end; ++r)
   {
-    mtx[r * cols + col] += (int)plus_step;
+    mtx[r * cols + col] += static_cast<int> (plus_step);
   }
 }
 
@@ -125,7 +125,7 @@ void petrov::hor_step_2(int * mtx, size_t row, size_t col_start, size_t col_end,
 {
   for (size_t i = col_start; i <= col_end; ++i)
   {
-    mtx[row * cols + i] += (int)plus_step;
+    mtx[row * cols + i] += static_cast<int> (plus_step);
   }
 }
 
@@ -205,7 +205,6 @@ int main(int argc, char ** argv)
     if (!input)
     {
       std::cerr << "BAD input\n";
-      delete[] matrix;
       return 2;
     }
 
