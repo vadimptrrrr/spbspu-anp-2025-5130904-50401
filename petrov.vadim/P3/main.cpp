@@ -1,21 +1,22 @@
 #include <iostream>
 #include <fstream>
 #include <cstddef>
+#include <cctype>
 
 namespace petrov
 {
-  void create(std::istream & input, int * mtx, size_t rows, size_t cols);
-  int * copy(int* mtx, size_t rows, size_t cols);
-  bool it_number(const char * w);
-  void LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t cols);
-  void vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols);
-  void hor_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_right, size_t cols);
-  void FLL_INC_WAV(std::ostream & output, int * mtx, size_t rows, size_t cols);
-  void vert_step_2(int * mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step);
-  void hor_step_2(int * mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step);
+  void create(std::istream& input, int* mtx, size_t rows, size_t cols);
+  int* copy(int* mtx, size_t rows, size_t cols);
+  bool it_number(const char* w);
+  void lft_bot_cnt(std::ostream& output, int* mtx, size_t rows, size_t cols);
+  void vert_step(int* mtx, long long top, long long bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols);
+  void hor_step(int* mtx, size_t top, size_t bottom, long long right, long long left, size_t& plus_step, bool move_right, size_t cols);
+  void fll_inc_wav(std::ostream& output, int* mtx, size_t rows, size_t cols);
+  void vert_step_2(int* mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step);
+  void hor_step_2(int* mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step);
 }
 
-int * petrov::copy(int* mtx, size_t rows, size_t cols)
+int* petrov::copy(int* mtx, size_t rows, size_t cols)
 {
   int* copy = new int[rows * cols]();
   for (size_t i = 0; i < (rows * cols); ++i) {
@@ -24,35 +25,19 @@ int * petrov::copy(int* mtx, size_t rows, size_t cols)
   return copy;
 }
 
-void petrov::create(std::istream & input, int * mtx, size_t rows, size_t cols)
+void petrov::create(std::istream& input, int* mtx, size_t rows, size_t cols)
 {
-  for(size_t i = 0; i < (rows*cols); ++i)
+  for(size_t i = 0; i < (rows * cols); ++i)
   {
     input >> mtx[i];
   }
 }
 
-bool petrov::it_number(const char * w)
-{
-  if (!w || *w == '\0')
-  {
-    return false;
-  }
-  for (size_t i = 0; w[i] != '\0'; ++i)
-  {
-    if (w[i] < '0' || w[i] > '9')
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
-void petrov::vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols)
+void petrov::vert_step(int* mtx, long long top, long long bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols)
 {
   if (move_down)
   {
-    for (long long i = static_cast<long long> (top); i <= static_cast<long long> (bottom); ++i)
+    for (long long i = top; i <= bottom; ++i)
     {
       mtx[i * cols + left] += plus_step;
       ++plus_step;
@@ -60,35 +45,35 @@ void petrov::vert_step(int * mtx, size_t top, size_t bottom, size_t right, size_
   }
   else
   {
-    for (long long i = static_cast<long long> (bottom); i >= static_cast<long long> (top); --i)
+    for (long long i = bottom; i >= top; --i)
     {
-      mtx[i * cols + right] += static_cast<int> (plus_step);
+      mtx[i * cols + right] += plus_step;
       ++plus_step;
     }
   }
 }
 
-void petrov::hor_step(int * mtx, size_t top, size_t bottom, size_t right, size_t left, size_t& plus_step, bool move_right, size_t cols)
+void petrov::hor_step(int* mtx, size_t top, size_t bottom, long long right, long long left, size_t& plus_step, bool move_right, size_t cols)
 {
   if (move_right)
   {
-    for (long long i = static_cast<long long> (left); i <= static_cast<long long> (right); ++i)
+    for (long long i = left; i <= right; ++i)
     {
-      mtx[bottom * cols + i] += static_cast<int> (plus_step);
+      mtx[bottom * cols + i] += plus_step;
       ++plus_step;
     }
   }
   else
   {
-    for (long long i = static_cast<long long> (right); i >= static_cast<long long> (left); --i)
+    for (long long i = right; i >= left; --i)
     {
-      mtx[top * cols + i] += static_cast<int> (plus_step);
+      mtx[top * cols + i] += plus_step;
       ++plus_step;
     }
   }
 }
 
-void petrov::LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t cols)
+void petrov::lft_bot_cnt(std::ostream& output, int* mtx, size_t rows, size_t cols)
 {
   size_t current_step = 1;
   size_t top = 0, bottom = rows - 1, right = cols - 1, left = 0;
@@ -123,7 +108,7 @@ void petrov::LFT_BOT_CNT(std::ostream & output, int * mtx, size_t rows, size_t c
   output << "\n";
 }
 
-void petrov::vert_step_2(int * mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step)
+void petrov::vert_step_2(int* mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step)
 {
   for (size_t r = row_start; r <= row_end; ++r)
   {
@@ -131,7 +116,7 @@ void petrov::vert_step_2(int * mtx, size_t col, size_t row_start, size_t row_end
   }
 }
 
-void petrov::hor_step_2(int * mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step)
+void petrov::hor_step_2(int* mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step)
 {
   for (size_t i = col_start; i <= col_end; ++i)
   {
@@ -139,7 +124,7 @@ void petrov::hor_step_2(int * mtx, size_t row, size_t col_start, size_t col_end,
   }
 }
 
-void petrov::FLL_INC_WAV(std::ostream & output, int * mtx, size_t rows, size_t cols)
+void petrov::fll_inc_wav(std::ostream& output, int* mtx, size_t rows, size_t cols)
 {
   size_t current_step = 1;
   size_t top = 0, bottom = rows - 1, right = cols - 1, left = 0;
@@ -179,21 +164,24 @@ void petrov::FLL_INC_WAV(std::ostream & output, int * mtx, size_t rows, size_t c
   output << "\n";
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
   if (argc < 4)
   {
     std::cerr << "Not enough arguments\n";
     return 1;
-  } else if (argc > 4)
+  }
+  else if (argc > 4)
   {
     std::cerr << "Too mush argument\n";
     return 1;
-  } else if (!petrov::it_number(argv[1]))
+  }
+  else if (!isdigit(*argv[1]))
   {
     std::cerr << "First parameter not number\n";
     return 1;
-  } else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0'))
+  }
+  else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0'))
   {
     std::cerr << "First parameter is out of range\n";
     return 1;
@@ -216,7 +204,7 @@ int main(int argc, char ** argv)
 
   if (argv[1][0] == '1')
   {
-    int * matrix1 = nullptr;
+    int* matrix1 = nullptr;
     bool allocated = false;
     const size_t MAX_SIZE = 10000;
     if (rows * cols <= MAX_SIZE)
@@ -242,17 +230,17 @@ int main(int argc, char ** argv)
       return 2;
     }
 
-    int * matrix2 = petrov::copy(matrix1, rows, cols);
-    petrov::LFT_BOT_CNT(output, matrix1, rows, cols);
-    petrov::FLL_INC_WAV(output, matrix2, rows, cols);
+    int* matrix2 = petrov::copy(matrix1, rows, cols);
+    petrov::lft_bot_cnt(output, matrix1, rows, cols);
+    petrov::fll_inc_wav(output, matrix2, rows, cols);
     delete[] matrix2;
     if (allocated) delete[] matrix1;
     return 0;
   }
 
-  int * matrix = new int[rows * cols];
+  int* matrix = new int[rows * cols];
   petrov::create(input, matrix, rows, cols);
-  int * matrix2 = petrov::copy(matrix, rows, cols);
+  int* matrix2 = petrov::copy(matrix, rows, cols);
 
   if (!input)
   {
@@ -264,14 +252,14 @@ int main(int argc, char ** argv)
 
   try
   {
-    petrov::LFT_BOT_CNT(output, matrix, rows, cols);
-    petrov::FLL_INC_WAV(output, matrix2, rows, cols);
+    petrov::lft_bot_cnt(output, matrix, rows, cols);
+    petrov::fll_inc_wav(output, matrix2, rows, cols);
   }
   catch(const std::exception& e)
   {
     delete[] matrix;
     delete[] matrix2;
-    throw;
+    return 2;
   }
 
   delete[] matrix;
