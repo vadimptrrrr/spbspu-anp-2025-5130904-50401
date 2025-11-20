@@ -5,15 +5,25 @@
 
 namespace petrov
 {
-  void create(std::istream& input, int* mtx, size_t rows, size_t cols);
+  std::istream& fill(std::istream& input, int* mtx, size_t rows, size_t cols);
   int* copy(int* mtx, size_t rows, size_t cols);
-  bool it_number(const char* w);
   void lft_bot_cnt(std::ostream& output, int* mtx, size_t rows, size_t cols);
   void vert_step(int* mtx, long long top, long long bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols);
   void hor_step(int* mtx, size_t top, size_t bottom, long long right, long long left, size_t& plus_step, bool move_right, size_t cols);
   void fll_inc_wav(std::ostream& output, int* mtx, size_t rows, size_t cols);
   void vert_step_2(int* mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step);
   void hor_step_2(int* mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step);
+  void fill_output(std::ostream& output, int* mtx, size_t rows, size_t cols);
+}
+
+void petrov::fill_output(std::ostream& output, int* mtx, size_t rows, size_t cols)
+{
+  output << rows << " " << cols;
+  for (size_t i = 0; i < rows * cols; ++i)
+  {
+    output << " " << mtx[i];
+  }
+  output << "\n";
 }
 
 int* petrov::copy(int* mtx, size_t rows, size_t cols)
@@ -25,12 +35,13 @@ int* petrov::copy(int* mtx, size_t rows, size_t cols)
   return copy;
 }
 
-void petrov::create(std::istream& input, int* mtx, size_t rows, size_t cols)
+std::istream& petrov::fill(std::istream& input, int* mtx, size_t rows, size_t cols)
 {
   for(size_t i = 0; i < (rows * cols); ++i)
   {
     input >> mtx[i];
   }
+  return input;
 }
 
 void petrov::vert_step(int* mtx, long long top, long long bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols)
@@ -100,12 +111,7 @@ void petrov::lft_bot_cnt(std::ostream& output, int* mtx, size_t rows, size_t col
       ++left;
     }
   }
-  output << rows << " " << cols;
-  for (size_t i = 0; i < rows * cols; ++i)
-  {
-    output << " " << mtx[i];
-  }
-  output << "\n";
+  fill_output(output, mtx, rows, cols);
 }
 
 void petrov::vert_step_2(int* mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step)
@@ -156,12 +162,7 @@ void petrov::fll_inc_wav(std::ostream& output, int* mtx, size_t rows, size_t col
     ++current_step;
   }
 
-  output << rows << " " << cols;
-  for (size_t i = 0; i < rows * cols; ++i)
-  {
-    output << " " << mtx[i];
-  }
-  output << "\n";
+    fill_output(output, mtx, rows, cols);
 }
 
 int main(int argc, char** argv)
@@ -170,19 +171,13 @@ int main(int argc, char** argv)
   {
     std::cerr << "Not enough arguments\n";
     return 1;
-  }
-  else if (argc > 4)
-  {
+  } else if (argc > 4) {
     std::cerr << "Too mush argument\n";
     return 1;
-  }
-  else if (!isdigit(*argv[1]))
-  {
+  } else if (!isdigit(*argv[1])) {
     std::cerr << "First parameter not number\n";
     return 1;
-  }
-  else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0'))
-  {
+  } else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0')) {
     std::cerr << "First parameter is out of range\n";
     return 1;
   }
@@ -222,11 +217,14 @@ int main(int argc, char** argv)
       allocated = true;
     }
 
-    petrov::create(input, matrix1, rows, cols);
+    petrov::fill(input, matrix1, rows, cols);
     if (!input)
     {
       std::cerr << "BAD input\n";
-      if (allocated) delete[] matrix1;
+      if (allocated)
+      {
+        delete[] matrix1;
+      }
       return 2;
     }
 
@@ -234,12 +232,15 @@ int main(int argc, char** argv)
     petrov::lft_bot_cnt(output, matrix1, rows, cols);
     petrov::fll_inc_wav(output, matrix2, rows, cols);
     delete[] matrix2;
-    if (allocated) delete[] matrix1;
+    if (allocated)
+    {
+      delete[] matrix1;
+    }
     return 0;
   }
 
   int* matrix = new int[rows * cols];
-  petrov::create(input, matrix, rows, cols);
+  petrov::fill(input, matrix, rows, cols);
   int* matrix2 = petrov::copy(matrix, rows, cols);
 
   if (!input)
@@ -255,7 +256,7 @@ int main(int argc, char** argv)
     petrov::lft_bot_cnt(output, matrix, rows, cols);
     petrov::fll_inc_wav(output, matrix2, rows, cols);
   }
-  catch(const std::exception& e)
+  catch (const std::exception& e)
   {
     delete[] matrix;
     delete[] matrix2;
