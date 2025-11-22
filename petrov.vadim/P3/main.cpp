@@ -171,13 +171,19 @@ int main(int argc, char** argv)
   {
     std::cerr << "Not enough arguments\n";
     return 1;
-  } else if (argc > 4) {
+  }
+  else if (argc > 4)
+  {
     std::cerr << "Too mush argument\n";
     return 1;
-  } else if (!isdigit(*argv[1])) {
+  }
+  else if (!isdigit(*argv[1]))
+  {
     std::cerr << "First parameter not number\n";
     return 1;
-  } else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0')) {
+  }
+  else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0'))
+  {
     std::cerr << "First parameter is out of range\n";
     return 1;
   }
