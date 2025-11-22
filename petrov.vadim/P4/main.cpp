@@ -14,6 +14,7 @@ namespace petrov{
   char* extend(char* old_str, char a);
   char* check_str(char* str1, char* str2, char* new_str);
   char* unc_sym(char* str1, char* str2);
+  int seq_sym(char* str);
 }
 
 char* petrov::get_line()
@@ -96,13 +97,28 @@ char* petrov::unc_sym(char* str1, char* str2)
   return new_str;
 }
 
+int petrov::seq_sym(char* str)
+{
+  size_t len = strlen(str);
+  for (size_t i = 0; i < len - 1; ++i)
+  {
+    if (str[i] == str[i + 1])
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 int main(){
   char* str1 = petrov::get_line();
   char* str2 = petrov::get_line();
 
   char* task1 = petrov::unc_sym(str1, str2);
+  size_t task2 = petrov::seq_sym(str1);
 
   std::cout << task1 << "\n";
+  std::cout << task2 << "\n";
 
   return 0;
 }
