@@ -6,7 +6,6 @@
 namespace petrov
 {
   std::istream& fill(std::istream& input, int* mtx, size_t rows, size_t cols);
-  int* copy(int* mtx, size_t rows, size_t cols);
   void lft_bot_cnt(std::ostream& output, int* mtx, size_t rows, size_t cols);
   void vert_step(int* mtx, long long top, long long bottom, size_t right, size_t left, size_t& plus_step, bool move_down, size_t cols);
   void hor_step(int* mtx, size_t top, size_t bottom, long long right, long long left, size_t& plus_step, bool move_right, size_t cols);
@@ -14,6 +13,43 @@ namespace petrov
   void vert_step_2(int* mtx, size_t col, size_t row_start, size_t row_end, size_t cols, size_t plus_step);
   void hor_step_2(int* mtx, size_t row, size_t col_start, size_t col_end, size_t cols, size_t plus_step);
   void fill_output(std::ostream& output, int* mtx, size_t rows, size_t cols);
+  bool create_matrix(std::istream& in, int*& mtx, size_t rows, size_t cols, bool choose_mode);
+}
+
+bool petrov::create_matrix(std::istream& in, int*& mtx, size_t rows, size_t cols, bool choose_mode)
+{
+  if (choose_mode)
+  {
+    const size_t MAX_SIZE = 10000;
+    if (rows * cols <= MAX_SIZE)
+    {
+      static int static_buf[MAX_SIZE];
+      for (size_t i = 0; i < (rows * cols); ++i)
+      {
+        static_buf[i] = 0;
+      }
+      mtx = static_buf;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    mtx = new int[rows * cols];
+  }
+  petrov::fill(in, mtx, rows, cols);
+  if (!in)
+  {
+    std::cerr << "BAD input\n";
+    if (choose_mode)
+    {
+      delete[] mtx;
+    }
+    return false;
+  }
+  return true;
 }
 
 void petrov::fill_output(std::ostream& output, int* mtx, size_t rows, size_t cols)
@@ -24,15 +60,6 @@ void petrov::fill_output(std::ostream& output, int* mtx, size_t rows, size_t col
     output << " " << mtx[i];
   }
   output << "\n";
-}
-
-int* petrov::copy(int* mtx, size_t rows, size_t cols)
-{
-  int* copy = new int[rows * cols]();
-  for (size_t i = 0; i < (rows * cols); ++i) {
-    copy[i] = mtx[i];
-  }
-  return copy;
 }
 
 std::istream& petrov::fill(std::istream& input, int* mtx, size_t rows, size_t cols)
@@ -171,13 +198,19 @@ int main(int argc, char** argv)
   {
     std::cerr << "Not enough arguments\n";
     return 1;
-  } else if (argc > 4) {
+  }
+  else if (argc > 4)
+  {
     std::cerr << "Too mush argument\n";
     return 1;
-  } else if (!isdigit(*argv[1])) {
+  }
+  else if (!isdigit(*argv[1]))
+  {
     std::cerr << "First parameter not number\n";
     return 1;
-  } else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0')) {
+  }
+  else if (!((argv[1][0] == '1' || argv[1][0] == '2') && argv[1][1] == '\0'))
+  {
     std::cerr << "First parameter is out of range\n";
     return 1;
   }
@@ -197,73 +230,28 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  if (argv[1][0] == '1')
+  int* matrix1 = nullptr;
+  int* matrix2 = nullptr;
+  bool allocated = (argv[1][0] == '1');
+  if(!(petrov::create_matrix(input, matrix1, rows, cols, allocated) && petrov::create_matrix(input, matrix2, rows, cols, allocated)))
   {
-    int* matrix1 = nullptr;
-    bool allocated = false;
-    const size_t MAX_SIZE = 10000;
-    if (rows * cols <= MAX_SIZE)
-    {
-      static int static_buf[MAX_SIZE];
-      for (size_t i = 0; i < (rows * cols); ++i)
-      {
-        static_buf[i] = 0;
-      }
-      matrix1 = static_buf;
-    }
-    else
-    {
-      matrix1 = new int[rows * cols];
-      allocated = true;
-    }
-
-    petrov::fill(input, matrix1, rows, cols);
-    if (!input)
-    {
-      std::cerr << "BAD input\n";
-      if (allocated)
-      {
-        delete[] matrix1;
-      }
-      return 2;
-    }
-
-    int* matrix2 = petrov::copy(matrix1, rows, cols);
-    petrov::lft_bot_cnt(output, matrix1, rows, cols);
-    petrov::fll_inc_wav(output, matrix2, rows, cols);
-    delete[] matrix2;
-    if (allocated)
-    {
-      delete[] matrix1;
-    }
-    return 0;
-  }
-
-  int* matrix = new int[rows * cols];
-  petrov::fill(input, matrix, rows, cols);
-  int* matrix2 = petrov::copy(matrix, rows, cols);
-
-  if (!input)
-  {
-    std::cerr << "BAD input\n";
-    delete[] matrix;
-    delete[] matrix2;
+    std::cerr << "matrix invalid\n";
     return 2;
   }
 
   try
   {
-    petrov::lft_bot_cnt(output, matrix, rows, cols);
+    petrov::lft_bot_cnt(output, matrix1, rows, cols);
     petrov::fll_inc_wav(output, matrix2, rows, cols);
   }
   catch (const std::exception& e)
   {
-    delete[] matrix;
+    delete[] matrix1;
     delete[] matrix2;
     return 2;
   }
 
-  delete[] matrix;
+  delete[] matrix1;
   delete[] matrix2;
 
   return 0;
