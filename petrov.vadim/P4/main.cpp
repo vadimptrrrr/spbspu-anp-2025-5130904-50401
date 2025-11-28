@@ -15,6 +15,41 @@ namespace petrov{
   char* check_str(char* str1, char* str2, char* new_str);
   char* unc_sym(char* str1, char* str2);
   int seq_sym(char* str);
+  char* remove_duplicates(char* str);
+}
+
+char* petrov::remove_duplicates(char* str)
+{
+  if (!str)
+  {
+    return nullptr;
+  }
+
+  bool seen[256] = {false};
+  char* result = static_cast<char*>(malloc(1));
+  if (!result)
+  {
+    return nullptr;
+  }
+  result[0] = '\0';
+
+  size_t len = strlen(str);
+  for (size_t i = 0; i < len; ++i)
+  {
+    unsigned char c = str[i];
+    if (!seen[c])
+    {
+      seen[c] = true;
+      char* temp = extend(result, c);
+      if (!temp)
+      {
+        free(result);
+        return nullptr;
+      }
+      result = temp;
+    }
+  }
+  return result;
 }
 
 char* petrov::get_line()
@@ -31,7 +66,6 @@ char* petrov::get_line()
     std::memcpy(str, tmp.c_str(), tmp.size() + 1);
     return str;
 }
-
 
 char* petrov::extend(char* old_str, char a)
 {
@@ -84,7 +118,6 @@ char* petrov::check_str(char* str1, char* str2, char* new_str)
 char* petrov::unc_sym(char* str1, char* str2)
 {
   char* new_str = static_cast<char*>(malloc(1));
-  new_str[0] = '\0';
   if (!new_str)
   {
     std::cerr << "malloc failed\n";
@@ -94,12 +127,23 @@ char* petrov::unc_sym(char* str1, char* str2)
 
   new_str = check_str(str1, str2, new_str);
   new_str = check_str(str2, str1, new_str);
-  return new_str;
+  if (!new_str)
+  {
+    return nullptr;
+  }
+
+  char* result = remove_duplicates(new_str);
+  free(new_str);
+  return result;
 }
 
 int petrov::seq_sym(char* str)
 {
   size_t len = strlen(str);
+  if(len < 2)
+  {
+    return 0;
+  }
   for (size_t i = 0; i < len - 1; ++i)
   {
     if (str[i] == str[i + 1])
@@ -112,13 +156,24 @@ int petrov::seq_sym(char* str)
 
 int main(){
   char* str1 = petrov::get_line();
-  char* str2 = petrov::get_line();
+  if(!str1)
+  {
+    return 1;
+  }
+  char* str2 = "abcd135790";
 
   char* task1 = petrov::unc_sym(str1, str2);
+  if(!task1)
+  {
+    free(str1);
+    return 1;
+  }
   size_t task2 = petrov::seq_sym(str1);
 
   std::cout << task1 << "\n";
   std::cout << task2 << "\n";
 
+  free(str1);
+  free(task1);
   return 0;
 }
