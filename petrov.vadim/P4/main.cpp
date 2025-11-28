@@ -55,7 +55,7 @@ char* petrov::remove_duplicates(char* str)
 char* petrov::get_line()
 {
   std::string tmp;
-  if(!(std::cin >> tmp))
+  if(!std::getline(std::cin, tmp))
   {
     std::cerr << "Bad input\n";
     return nullptr;
