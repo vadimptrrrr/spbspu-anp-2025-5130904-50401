@@ -160,7 +160,8 @@ int main(){
   {
     return 1;
   }
-  char* str2 = "abcd135790";
+  char string[] = "abcd135790";
+  char* str2 = string;
 
   char* task1 = petrov::unc_sym(str1, str2);
   if(!task1)
