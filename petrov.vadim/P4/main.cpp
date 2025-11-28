@@ -54,17 +54,21 @@ char* petrov::remove_duplicates(char* str)
 
 char* petrov::get_line()
 {
-    std::string tmp;
-    std::cin >> tmp;
+  std::string tmp;
+  if(!(std::cin >> tmp))
+  {
+    std::cerr << "Bad input\n";
+    return nullptr;
+  }
 
-    char* str = static_cast<char*>(std::malloc(tmp.size() + 1));
-    if (!str)
-    {
-      std::cerr << "malloc failed\n";
-      return nullptr;
-    }
-    std::memcpy(str, tmp.c_str(), tmp.size() + 1);
-    return str;
+  char* str = static_cast<char*>(std::malloc(tmp.size() + 1));
+  if (!str)
+  {
+    std::cerr << "malloc failed\n";
+    return nullptr;
+  }
+  std::memcpy(str, tmp.c_str(), tmp.size() + 1);
+  return str;
 }
 
 char* petrov::extend(char* old_str, char a)
