@@ -1,16 +1,12 @@
-/*
-malloc/free
-UNC-SYM
-SEQ-SYM
-*/
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <iomanip>
 
 namespace petrov{
-  char* get_line();
+  char* get_line(std::istream& input);
   char* extend(char* old_str, char a);
   char* check_str(char* str1, char* str2, char* new_str);
   char* unc_sym(char* str1, char* str2);
@@ -26,7 +22,7 @@ char* petrov::remove_duplicates(char* str)
   }
 
   bool seen[256] = {false};
-  char* result = static_cast<char*>(malloc(1));
+  char* result = static_cast< char* >(malloc(1));
   if (!result)
   {
     return nullptr;
@@ -52,22 +48,30 @@ char* petrov::remove_duplicates(char* str)
   return result;
 }
 
-char* petrov::get_line()
+char* petrov::get_line(std::istream& input)
 {
-  std::string tmp;
-  if(!std::getline(std::cin, tmp))
-  {
-    std::cerr << "Bad input\n";
-    return nullptr;
+  bool is_skipws = input.flags()& std::ios_base::skipws;
+  if (is_skipws) {
+    input >> std::noskipws;
   }
-
-  char* str = static_cast<char*>(std::malloc(tmp.size() + 1));
-  if (!str)
-  {
-    std::cerr << "malloc failed\n";
-    return nullptr;
+  size_t str_size = 10, i = 0;
+  char * str = static_cast< char* >(malloc(sizeof(char) * str_size));
+  while (input) {
+    if (i >= str_size - 1) {
+      petrov::extend(str, '\0');
+      str_size += 5;
+    }
+    char ch = 0;
+    input >> ch;
+    if (ch == '\n') {
+      break;
+    }
+    str[i] = ch;
+    ++i;
   }
-  std::memcpy(str, tmp.c_str(), tmp.size() + 1);
+  if (is_skipws) {
+    input >> std::skipws;
+  }
   return str;
 }
 
@@ -82,11 +86,18 @@ char* petrov::extend(char* old_str, char a)
   char* new_str = static_cast<char*>(malloc(len + 2));
   if (old_str && len > 0)
   {
-    memcpy(new_str, old_str, len);
+    for(size_t i = 0; i < len; ++i)
+    {
+      new_str[i] = old_str[i];
+    }
   }
 
   new_str[len] = a;
-  new_str[len + 1] = '\0';
+  if(a != '\0')
+  {
+    new_str[len + 1] = '\0';
+  }
+
   free(old_str);
   return new_str;
 }
@@ -159,7 +170,7 @@ int petrov::seq_sym(char* str)
 }
 
 int main(){
-  char* str1 = petrov::get_line();
+  char* str1 = petrov::get_line(std::cin);
   if(!str1)
   {
     return 1;
