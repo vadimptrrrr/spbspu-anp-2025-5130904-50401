@@ -95,7 +95,7 @@ char* petrov::get_line(std::istream& input, size_t& size)
     ++i;
   }
 
-  if(!input)
+  if(!input || i == 0)
   {
     std::cerr << "bad input\n";
     return nullptr;
@@ -190,11 +190,10 @@ int petrov::seq_sym(char* str, size_t size)
 }
 
 int main(){
-  size_t len1 = 10;
+  size_t len1 = 0;
   char* str1 = petrov::get_line(std::cin, len1);
   if(!str1)
   {
-    free(str1);
     return 1;
   }
   char string[] = "abcd135790";
