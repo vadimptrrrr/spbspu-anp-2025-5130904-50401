@@ -76,7 +76,7 @@ char* petrov::get_line(std::istream& input, size_t& size)
     if (i >= str_size - 1)
     {
       size_t new_size = str_size + 5;
-      char* new_str = resize(str, str_size, new_size);
+      char* new_str = resize(str, i, new_size);
       if (!new_str)
       {
         free(str);
@@ -93,6 +93,12 @@ char* petrov::get_line(std::istream& input, size_t& size)
     }
     str[i] = ch;
     ++i;
+  }
+
+  if(!input)
+  {
+    std::cerr << "bad input\n";
+    return nullptr;
   }
   str[i] = '\0';
   size = i;
@@ -188,6 +194,7 @@ int main(){
   char* str1 = petrov::get_line(std::cin, len1);
   if(!str1)
   {
+    free(str1);
     return 1;
   }
   char string[] = "abcd135790";
