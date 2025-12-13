@@ -68,7 +68,7 @@ char* petrov::get_line(std::istream& input, size_t& size)
     input >> std::noskipws;
   }
 
-  size_t str_size = size, i = 0;
+  size_t str_size = (size > 0)? size : 1, i = 0;
   char * str = static_cast< char* >(malloc(str_size));
 
   while (input)
@@ -190,7 +190,7 @@ int petrov::seq_sym(char* str, size_t size)
 }
 
 int main(){
-  size_t len1 = 0;
+  size_t len1 = 1;
   char* str1 = petrov::get_line(std::cin, len1);
   if(!str1)
   {
