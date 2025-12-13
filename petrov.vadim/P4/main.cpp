@@ -42,7 +42,7 @@ char* petrov::remove_duplicates(char* str, size_t& size)
   size_t rsize = 0;
   result[0] = '\0';
 
-  for (size_t i = 0; i < size; ++i)
+  for (size_t i = 0; i <= size; ++i)
   {
     unsigned char c = str[i];
     if (!seen[c])
@@ -98,6 +98,7 @@ char* petrov::get_line(std::istream& input, size_t& size)
   if(!input || i == 0)
   {
     std::cerr << "bad input\n";
+    free(str);
     return nullptr;
   }
   str[i] = '\0';
