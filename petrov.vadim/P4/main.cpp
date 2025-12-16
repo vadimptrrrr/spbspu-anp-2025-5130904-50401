@@ -5,13 +5,14 @@
 #include <string>
 #include <iomanip>
 
-namespace petrov{
-  char* get_line(std::istream& input, size_t& size);
+namespace petrov
+{
+  char* getLine(std::istream& input, size_t& size);
   char* extend(char* old_str, char a, size_t& size);
-  char* check_str(char* str1, size_t size1, char* str2, size_t size2, char* new_str, size_t& ns);
-  char* unc_sym(char* str1, size_t size1, char* str2, size_t size2);
-  int seq_sym(char* str, size_t size);
-  char* remove_duplicates(char* str, size_t& size);
+  char* checkStr(char* str1, size_t size1, char* str2, size_t size2, char* new_str, size_t& ns);
+  char* uncSym(char* str1, size_t size1, char* str2, size_t size2, char* res);
+  int seqSym(char* str, size_t size);
+  char* removeDuplicates(char* str, size_t& size, char* res);
   char* resize(char* old_str, size_t old_size, size_t new_size);
 }
 
@@ -30,7 +31,7 @@ char* petrov::resize(char* old_str, size_t old_size, size_t new_size)
   return new_str;
 }
 
-char* petrov::remove_duplicates(char* str, size_t& size)
+char* petrov::removeDuplicates(char* str, size_t& size, char* result)
 {
   if (!str)
   {
@@ -38,7 +39,6 @@ char* petrov::remove_duplicates(char* str, size_t& size)
   }
 
   bool seen[256] = {false};
-  char* result = static_cast< char* >(malloc(1));
   size_t rsize = 0;
   result[0] = '\0';
 
@@ -61,15 +61,15 @@ char* petrov::remove_duplicates(char* str, size_t& size)
   return result;
 }
 
-char* petrov::get_line(std::istream& input, size_t& size)
+char* petrov::getLine(std::istream& input, size_t& size)
 {
-  bool is_skipws = input.flags()& std::ios_base::skipws;
+  bool is_skipws = input.flags() & std::ios_base::skipws;
   if (is_skipws) {
     input >> std::noskipws;
   }
 
-  size_t str_size = (size > 0)? size : 1, i = 0;
-  char * str = static_cast< char* >(malloc(str_size));
+  size_t str_size = (size > 0) ? size : 1, i = 0;
+  char* str = reinterpret_cast< char* >(malloc(str_size));
 
   while (input)
   {
@@ -95,7 +95,7 @@ char* petrov::get_line(std::istream& input, size_t& size)
     ++i;
   }
 
-  if(!input || i == 0)
+  if (!input || i == 0)
   {
     std::cerr << "bad input\n";
     free(str);
@@ -134,7 +134,7 @@ char* petrov::extend(char* old_str, char a, size_t& size)
   return new_str;
 }
 
-char* petrov::check_str(char* str1, size_t size1, char* str2, size_t size2, char* new_str, size_t& ns)
+char* petrov::checkStr(char* str1, size_t size1, char* str2, size_t size2, char* new_str, size_t& ns)
 {
   if (!str1 || !str2)
   {
@@ -160,23 +160,23 @@ char* petrov::check_str(char* str1, size_t size1, char* str2, size_t size2, char
   return new_str;
 }
 
-char* petrov::unc_sym(char* str1, size_t size1, char* str2, size_t size2)
+char* petrov::uncSym(char* str1, size_t size1, char* str2, size_t size2, char* res)
 {
   char* new_str = static_cast< char* >(malloc(1));
   size_t ns = 0;
   new_str[0] = '\0';
 
-  new_str = check_str(str1, size1, str2, size2, new_str, ns);
-  new_str = check_str(str2, size2, str1, size1, new_str, ns);
+  new_str = checkStr(str1, size1, str2, size2, new_str, ns);
+  new_str = checkStr(str2, size2, str1, size1, new_str, ns);
 
-  char* result = remove_duplicates(new_str, ns);
+  char* result = removeDuplicates(new_str, ns, res);
   free(new_str);
   return result;
 }
 
-int petrov::seq_sym(char* str, size_t size)
+int petrov::seqSym(char* str, size_t size)
 {
-  if(size < 2)
+  if (size < 2)
   {
     return 0;
   }
@@ -190,10 +190,11 @@ int petrov::seq_sym(char* str, size_t size)
   return 0;
 }
 
-int main(){
+int main()
+{
   size_t len1 = 1;
-  char* str1 = petrov::get_line(std::cin, len1);
-  if(!str1)
+  char* str1 = petrov::getLine(std::cin, len1);
+  if (!str1)
   {
     return 1;
   }
@@ -201,13 +202,14 @@ int main(){
   size_t len2 = 10;
   char* str2 = string;
 
-  char* task1 = petrov::unc_sym(str1, len1, str2, len2);
-  if(!task1)
+  char* task1 = static_cast< char* >(malloc(1));
+  task1 = petrov::uncSym(str1, len1, str2, len2, task1);
+  if (!task1)
   {
     free(str1);
     return 1;
   }
-  size_t task2 = petrov::seq_sym(str1, len1);
+  size_t task2 = petrov::seqSym(str1, len1);
 
   std::cout << task1 << "\n";
   std::cout << task2 << "\n";
